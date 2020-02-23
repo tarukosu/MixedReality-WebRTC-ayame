@@ -1,0 +1,3 @@
+[submodule "External/MixedReality-WebRTC"]
+	path = External/MixedReality-WebRTC
+	url = https://github.com/microsoft/MixedReality-WebRTC.git
