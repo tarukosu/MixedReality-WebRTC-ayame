@@ -40,7 +40,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
         [JsonProperty("sdp")]
         public string Sdp { set; get; }
-
     }
 
     [Preserve]
@@ -49,13 +48,26 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
         [JsonProperty("type")]
         public string Type { set; get; }
 
-        //[JsonProperty("ice")]
+        [JsonProperty("ice")]
+        public Ice Ice { set; get; }
         //public Dictionary<string, string> Ice { set; get; }
+
+        // [JsonProperty("candidate")]
+        // public string Candidate { set; get; }
+    }
+
+    [Preserve]
+    public class Ice
+    {
         [JsonProperty("candidate")]
         public string Candidate { set; get; }
 
-    }
+        [JsonProperty("sdpMid")]
+        public string SdpMid { set; get; }
 
+        [JsonProperty("sdpMLineIndex")]
+        public int SdpMLineIndex { set; get; }
+    }
 
     [Preserve]
     public class IceServerMessage
@@ -79,13 +91,16 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
         [JsonProperty("iceServers")]
         public List<IceServerMessage> IceServers { set; get; }
 
-        [JsonProperty("isExistUser")]
-        public string IsExistUser { set; get; }
+        [JsonProperty("isExistClient")]
+        public bool IsExistClient { set; get; }
 
         [JsonProperty("sdp")]
         public string Sdp { set; get; }
 
-        [JsonProperty("candidate")]
-        public string Candidate { set; get; }
+        [JsonProperty("ice")]
+        public Ice Ice { set; get; }
+
+        //[JsonProperty("candidate")]
+        //public string Candidate { set; get; }
     }
 }

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Scripting;
-
-using Microsoft.MixedReality.WebRTC.Unity;
 
 using Newtonsoft.Json;
 using WebSocket4Net;
@@ -24,9 +20,13 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
         [SerializeField]
         string roomId = "";
 
-        WebSocket ws;
+        [SerializeField]
+        bool autoReconnect = true;
 
-        bool registered = false;
+        [SerializeField]
+        bool printDebugLog = false;
+
+        WebSocket ws;
 
         readonly object messageQueueLock = new object();
         ConcurrentQueue<ReceivedMessage> receivedMessageQueue = new ConcurrentQueue<ReceivedMessage>();
@@ -38,7 +38,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             ws.Opened += Websocket_Opened;
             ws.MessageReceived += Websocket_MessageReceived;
             ws.Closed += Websocket_Closed;
-            ws.DataReceived += Websocket_DataReceived;
             ws.Error += Websocket_Error;
 
             ws.AutoSendPingInterval = 30;
@@ -74,30 +73,38 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             }
         }
 
-        
+        #region Websocket Events
+        private void Websocket_Opened(object sender, EventArgs e)
+        {
+            SendRegisterMessage();
+        }
 
         private void Websocket_Error(object sender, ErrorEventArgs e)
         {
-            Debug.Log("error");
-
+            Debug.LogError(e.Exception);
         }
 
         private void Websocket_Closed(object sender, EventArgs e)
         {
-            Debug.Log("closed");
+            if (printDebugLog)
+            {
+                Debug.Log("Websocket closed");
+            }
 
-        }
-
-        private void Websocket_DataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Debug.Log("data received");
-
+            if (autoReconnect)
+            {
+                Debug.Log("Reconnect to server");
+                _ = WaitAndConnect();
+            }
         }
 
         private void Websocket_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Debug.Log($"message received: {e.Message}");
-            // var message = e.Message;
+            if (printDebugLog)
+            {
+                Debug.Log($"Message received: {e.Message}");
+            }
+
             try
             {
                 var message = JsonConvert.DeserializeObject<ReceivedMessage>(e.Message);
@@ -111,79 +118,36 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
                 Debug.LogError(exception);
             }
         }
+        #endregion
 
         private void ProcessMessage(ReceivedMessage message)
         {
-            if (message.IceServers != null)
-            {
-                foreach (var ice in message.IceServers)
-                {
-                    // Debug.Log(ice.Credential);
-                }
-            }
-
-            Debug.Log($"Received SDP message: type={message.Type} data={message.Sdp}");
-
             switch (message.Type)
             {
                 case "ping":
-                    SendPong();
+                    SendPongMessage();
                     break;
                 case "accept":
-                    Debug.Log(message.IsExistUser);
-                    /*
-                    if (message.IsExistUser == null)
+                    if (message.IsExistClient)
                     {
                         PeerConnection.Peer.CreateOffer();
                     }
-                    else
-                    {
-                        if (message.IsExistUser == "true")
-                        {
-                            PeerConnection.Peer.CreateOffer();
-                        }
-                    }
-                    */
                     break;
                 case "offer":
-                    Debug.Log("offer");
-                    Debug.Log(message.Sdp);
                     _nativePeer.SetRemoteDescription("offer", message.Sdp);
-                    var result = _nativePeer.CreateAnswer();
-                    Debug.Log("create answer" + result);
+                    _nativePeer.CreateAnswer();
                     break;
                 case "answer":
-                    Debug.Log("answer");
                     _nativePeer.SetRemoteDescription("answer", message.Sdp);
                     break;
                 case "candidate":
-                    Debug.Log("candidate");
-                    var parts = message.Candidate.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
-                    // Note the inverted arguments; candidate is last here, but first in OnIceCandiateReadyToSend
-                    _nativePeer.AddIceCandidate(parts[2], int.Parse(parts[1]), parts[0]);
+                    _nativePeer.AddIceCandidate(message.Ice.SdpMid, message.Ice.SdpMLineIndex, message.Ice.Candidate);
                     break;
             }
         }
 
-        private void SendPong()
+        private void SendRegisterMessage()
         {
-            var message = new PongMessage()
-            {
-                Type = "pong"
-            };
-            SendWsMessage(message);
-        }
-
-        private void Websocket_Opened(object sender, EventArgs e)
-        {
-            Debug.Log("opened");
-
-            if (registered)
-            {
-                return;
-            }
-            registered = true;
-
             var clientId = Guid.NewGuid().ToString("N").Substring(0, 10);
 
             var message = new RegisterMessage()
@@ -197,6 +161,15 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             SendWsMessage(message);
         }
 
+        private void SendPongMessage()
+        {
+            var message = new PongMessage()
+            {
+                Type = "pong"
+            };
+            SendWsMessage(message);
+        }
+
         private void SendWsMessage(object message)
         {
             var serializedMessage = JsonConvert.SerializeObject(message);
@@ -205,19 +178,17 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
         private void SendWsMessage(string message)
         {
-            Debug.Log($"send: {message}");
+            if (printDebugLog)
+            {
+                Debug.Log($"Send message: {message}");
+            }
             ws.Send(message);
         }
-
 
         #region ISignaler interface
 
         public override Task SendMessageAsync(Message message)
         {
-            //Debug.Log("SendMessageAsync");
-            //Debug.Log(message);
-            Debug.Log(message.MessageType);
-
             var type = "";
             switch (message.MessageType)
             {
@@ -234,19 +205,18 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
             if (message.MessageType == Message.WireMessageType.Ice)
             {
+                var iceParts = message.Data.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
                 var iceMessage = new IceMessage()
                 {
                     Type = type,
-                    Candidate = message.Data
-                    /*
-                    Ice = new Dictionary<string, string>
+                    Ice = new Ice()
                     {
-                        {"candidate", message.Data}
+                        Candidate = iceParts[0],
+                        SdpMLineIndex = int.Parse(iceParts[1]),
+                        SdpMid = iceParts[2],
                     }
-                    */
                 };
-
-                SendWsMessage(JsonConvert.SerializeObject(iceMessage));
+                SendWsMessage(iceMessage);
             }
             else
             {
@@ -255,13 +225,10 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
                     Type = type,
                     Sdp = message.Data
                 };
-
-                SendWsMessage(JsonConvert.SerializeObject(sdpMessage));
+                SendWsMessage(sdpMessage);
             }
 
             return Task.CompletedTask;
-            //if(message.MessageType == Message.WireMessageType.Answer)
-            //throw new NotImplementedException();
         }
 
         #endregion
@@ -269,21 +236,14 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
         protected override void OnIceCandiateReadyToSend(string candidate, int sdpMlineIndex, string sdpMid)
         {
-            Debug.Log("OnIce");
-            Debug.LogWarning("OnIce");
-            //throw new NotImplementedException();
         }
 
         protected override void OnSdpOfferReadyToSend(string offer)
         {
-            Debug.LogWarning("OnSdpOffer");
-            //throw new NotImplementedException();
         }
 
         protected override void OnSdpAnswerReadyToSend(string answer)
         {
-            Debug.LogWarning("OnSdpAnswer");
-            //throw new NotImplementedException();
         }
     }
 }
