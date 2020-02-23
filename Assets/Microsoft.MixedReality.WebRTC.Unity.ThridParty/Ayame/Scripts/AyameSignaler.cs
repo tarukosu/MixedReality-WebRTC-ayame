@@ -94,7 +94,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             if (autoReconnect)
             {
                 Debug.Log("Reconnect to server");
-                _ = WaitAndConnect();
+                ws.Open();
             }
         }
 
