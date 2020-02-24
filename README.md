@@ -1,5 +1,5 @@
-# MixedReality-WebRTC-ayame
-このリポジトリを使うことで、MixedReality-WebRTC にてシグナリングサーバとして Ayame を利用できます。
+# MixedReality-WebRTC-ayame とは
+MixedReality-WebRTC にて、シグナリングサーバとして Ayame を利用するためのコードです。
 
 # MixedReality-WebRTC とは
 Microsoft が開発している、Mixed Reality アプリケーションで WebRTC を利用するためのライブラリです。
