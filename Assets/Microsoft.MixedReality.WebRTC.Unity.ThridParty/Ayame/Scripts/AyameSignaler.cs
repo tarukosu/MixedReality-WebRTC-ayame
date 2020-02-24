@@ -5,7 +5,11 @@ using UnityEngine;
 
 using Newtonsoft.Json;
 using WebSocket4Net;
-using SuperSocket.ClientEngine;
+// using SuperSocket.ClientEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 {
@@ -21,29 +25,36 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
         string roomId = "";
 
         [SerializeField]
-        bool autoReconnect = true;
+        bool autoConnection = true;
 
         [SerializeField]
         bool printDebugLog = false;
 
         WebSocket ws;
+        bool tryToConnect = false;
 
         readonly object messageQueueLock = new object();
         ConcurrentQueue<ReceivedMessage> receivedMessageQueue = new ConcurrentQueue<ReceivedMessage>();
 
-        void Start()
+        async void Start()
         {
             ws = new WebSocket(serverUrl);
 
             ws.Opened += Websocket_Opened;
             ws.MessageReceived += Websocket_MessageReceived;
             ws.Closed += Websocket_Closed;
-            ws.Error += Websocket_Error;
+            // ws.Error += Websocket_Error;
 
             ws.AutoSendPingInterval = 30;
             ws.EnableAutoSendPing = true;
 
-            _ = WaitAndConnect();
+            if (autoConnection)
+            {
+                await Task.Delay(3000);
+                tryToConnect = true;
+            }
+
+            // _ = WaitAndConnect();
         }
 
         protected override void Update()
@@ -57,12 +68,30 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
                     ProcessMessage(message);
                 }
             }
+
+            if (tryToConnect)
+            {
+                Connect();
+            }
+        }
+
+        private void Connect()
+        {
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlaying)
+            {
+                return;
+            }
+#endif
+            tryToConnect = false;
+            ws.Open();
         }
 
         private async Task WaitAndConnect()
         {
             await Task.Delay(3000);
-            ws.Open();
+            tryToConnect = true;
+            // ws.Open();
         }
 
         private void OnDisable()
@@ -79,22 +108,29 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             SendRegisterMessage();
         }
 
+        /*
         private void Websocket_Error(object sender, ErrorEventArgs e)
         {
             Debug.LogError(e.Exception);
         }
+        */
 
-        private void Websocket_Closed(object sender, EventArgs e)
+        private async void Websocket_Closed(object sender, EventArgs e)
         {
             if (printDebugLog)
             {
                 Debug.Log("Websocket closed");
             }
 
-            if (autoReconnect)
+            if (autoConnection)
             {
-                Debug.Log("Reconnect to server");
-                ws.Open();
+                await Task.Delay(1000);
+
+                if (printDebugLog)
+                {
+                    Debug.Log("Reconnect to server");
+                }
+                tryToConnect = true;
             }
         }
 
