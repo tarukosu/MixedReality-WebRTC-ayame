@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Scripting;
 
 namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
@@ -50,23 +48,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
         [JsonProperty("ice")]
         public Ice Ice { set; get; }
-        //public Dictionary<string, string> Ice { set; get; }
-
-        // [JsonProperty("candidate")]
-        // public string Candidate { set; get; }
-    }
-
-    [Preserve]
-    public class Ice
-    {
-        [JsonProperty("candidate")]
-        public string Candidate { set; get; }
-
-        [JsonProperty("sdpMid")]
-        public string SdpMid { set; get; }
-
-        [JsonProperty("sdpMLineIndex")]
-        public int SdpMLineIndex { set; get; }
     }
 
     [Preserve]
@@ -99,8 +80,18 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
 
         [JsonProperty("ice")]
         public Ice Ice { set; get; }
+    }
 
-        //[JsonProperty("candidate")]
-        //public string Candidate { set; get; }
+    [Preserve]
+    public class Ice
+    {
+        [JsonProperty("candidate")]
+        public string Candidate { set; get; }
+
+        [JsonProperty("sdpMid")]
+        public string SdpMid { set; get; }
+
+        [JsonProperty("sdpMLineIndex")]
+        public int SdpMLineIndex { set; get; }
     }
 }

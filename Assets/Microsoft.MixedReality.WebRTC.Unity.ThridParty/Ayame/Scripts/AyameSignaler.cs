@@ -5,7 +5,6 @@ using UnityEngine;
 
 using Newtonsoft.Json;
 using WebSocket4Net;
-// using SuperSocket.ClientEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -43,7 +42,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             ws.Opened += Websocket_Opened;
             ws.MessageReceived += Websocket_MessageReceived;
             ws.Closed += Websocket_Closed;
-            // ws.Error += Websocket_Error;
 
             ws.AutoSendPingInterval = 30;
             ws.EnableAutoSendPing = true;
@@ -53,8 +51,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
                 await Task.Delay(3000);
                 tryToConnect = true;
             }
-
-            // _ = WaitAndConnect();
         }
 
         protected override void Update()
@@ -75,6 +71,14 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             }
         }
 
+        private void OnDisable()
+        {
+            if (ws != null && ws.State == WebSocketState.Open)
+            {
+                ws.Close();
+            }
+        }
+
         private void Connect()
         {
 #if UNITY_EDITOR
@@ -87,33 +91,12 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             ws.Open();
         }
 
-        private async Task WaitAndConnect()
-        {
-            await Task.Delay(3000);
-            tryToConnect = true;
-            // ws.Open();
-        }
-
-        private void OnDisable()
-        {
-            if (ws != null && ws.State == WebSocketState.Open)
-            {
-                ws.Close();
-            }
-        }
 
         #region Websocket Events
         private void Websocket_Opened(object sender, EventArgs e)
         {
             SendRegisterMessage();
         }
-
-        /*
-        private void Websocket_Error(object sender, ErrorEventArgs e)
-        {
-            Debug.LogError(e.Exception);
-        }
-        */
 
         private async void Websocket_Closed(object sender, EventArgs e)
         {
@@ -203,6 +186,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
             {
                 Type = "pong"
             };
+
             SendWsMessage(message);
         }
 
