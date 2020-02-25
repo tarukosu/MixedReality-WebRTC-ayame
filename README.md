@@ -21,6 +21,7 @@ https://ayame-lite.shiguredo.jp/beta
 1. MixedReality-WebRTC-ayame をインポート
 1. 以下の DLL をインポート
     - WebSocket4Net
+    - SuperSocket.ClientEngine
     - Newtonsoft.Json
 
 # 使い方
