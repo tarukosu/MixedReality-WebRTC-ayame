@@ -1,5 +1,5 @@
 {
-    "name": "Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame",
+    "name": "Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame",
     "references": [
         "Microsoft.MixedReality.WebRTC.Unity"
     ],

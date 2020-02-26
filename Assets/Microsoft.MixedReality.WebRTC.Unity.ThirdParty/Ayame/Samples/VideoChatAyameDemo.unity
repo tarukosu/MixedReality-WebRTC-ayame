@@ -327,12 +327,17 @@ PrefabInstance:
     - target: {fileID: 3528224858423164824, guid: a81faf18fc0629a4f9b3e7b39af28982,
         type: 3}
       propertyPath: signalingKey
-      value: 
+      value: 5oc7v7en0XcbFYLxB5EuObcFL9ZqX2AseD3sNBKDt4T6lopa
       objectReference: {fileID: 0}
     - target: {fileID: 3528224858423164824, guid: a81faf18fc0629a4f9b3e7b39af28982,
         type: 3}
       propertyPath: roomId
-      value: 
+      value: tarukosu@a
+      objectReference: {fileID: 0}
+    - target: {fileID: 3528224858423164824, guid: a81faf18fc0629a4f9b3e7b39af28982,
+        type: 3}
+      propertyPath: printDebugLog
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a81faf18fc0629a4f9b3e7b39af28982, type: 3}

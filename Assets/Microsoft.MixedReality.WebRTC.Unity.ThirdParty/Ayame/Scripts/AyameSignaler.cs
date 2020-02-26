@@ -10,7 +10,7 @@ using WebSocket4Net;
 using UnityEditor;
 #endif
 
-namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
+namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
 {
     public class AyameSignaler : Signaler
     {

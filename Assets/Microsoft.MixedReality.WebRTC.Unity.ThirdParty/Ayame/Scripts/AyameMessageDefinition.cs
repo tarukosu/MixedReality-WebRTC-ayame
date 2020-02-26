@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.Scripting;
 
-namespace Microsoft.MixedReality.WebRTC.Unity.ThridParty.Ayame
+namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
 {
     [Preserve]
     public class RegisterMessage
