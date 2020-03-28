@@ -35,6 +35,18 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
         readonly object messageQueueLock = new object();
         ConcurrentQueue<ReceivedMessage> receivedMessageQueue = new ConcurrentQueue<ReceivedMessage>();
 
+        public string RoomId
+        {
+            set
+            {
+                roomId = value;
+            }
+            get
+            {
+                return roomId;
+            }
+        }
+
         async void Start()
         {
             ws = new WebSocket(serverUrl);
@@ -67,7 +79,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
 
             if (tryToConnect)
             {
-                Connect();
+                ConnectToServer();
             }
         }
 
@@ -79,7 +91,12 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             }
         }
 
-        private void Connect()
+        public void Connect()
+        {
+            tryToConnect = true;
+        }
+
+        private void ConnectToServer()
         {
 #if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
