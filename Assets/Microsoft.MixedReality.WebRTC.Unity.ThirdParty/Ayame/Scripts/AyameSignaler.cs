@@ -83,12 +83,13 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             }
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             if (ws != null && ws.State == WebSocketState.Open)
             {
                 ws.Close();
             }
+            base.OnDisable();
         }
 
         public void Connect()
@@ -170,14 +171,14 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
                     }
                     break;
                 case "offer":
-                    _nativePeer.SetRemoteDescription("offer", message.Sdp);
+                    _nativePeer.SetRemoteDescriptionAsync(message.ToWebRTCMessage());
                     _nativePeer.CreateAnswer();
                     break;
                 case "answer":
-                    _nativePeer.SetRemoteDescription("answer", message.Sdp);
+                    _nativePeer.SetRemoteDescriptionAsync(message.ToWebRTCMessage());
                     break;
                 case "candidate":
-                    _nativePeer.AddIceCandidate(message.Ice.SdpMid, message.Ice.SdpMLineIndex, message.Ice.Candidate);
+                    _nativePeer.AddIceCandidate(message.ToIceCandidate());
                     break;
             }
         }
@@ -222,65 +223,91 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             ws.Send(message);
         }
 
-        #region ISignaler interface
-
-        public override Task SendMessageAsync(Message message)
-        {
-            var type = "";
-            switch (message.MessageType)
-            {
-                case Message.WireMessageType.Offer:
-                    type = "offer";
-                    break;
-                case Message.WireMessageType.Answer:
-                    type = "answer";
-                    break;
-                case Message.WireMessageType.Ice:
-                    type = "candidate";
-                    break;
-            }
-
-            if (message.MessageType == Message.WireMessageType.Ice)
-            {
-                var iceParts = message.Data.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
-                var iceMessage = new IceMessage()
+        /*
+                public override Task SendMessageAsync(Message message)
                 {
-                    Type = type,
-                    Ice = new Ice()
+                    var type = "";
+                    switch (message.MessageType)
                     {
-                        Candidate = iceParts[0],
-                        SdpMLineIndex = int.Parse(iceParts[1]),
-                        SdpMid = iceParts[2],
+                        case Message.WireMessageType.Offer:
+                            type = "offer";
+                            break;
+                        case Message.WireMessageType.Answer:
+                            type = "answer";
+                            break;
+                        case Message.WireMessageType.Ice:
+                            type = "candidate";
+                            break;
                     }
-                };
-                SendWsMessage(iceMessage);
-            }
-            else
-            {
-                var sdpMessage = new SdpMessage()
-                {
-                    Type = type,
-                    Sdp = message.Data
-                };
-                SendWsMessage(sdpMessage);
-            }
 
+                    if (message.MessageType == Message.WireMessageType.Ice)
+                    {
+                        var iceParts = message.Data.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+                        var iceMessage = new IceMessage()
+                        {
+                            Type = type,
+                            Ice = new Ice()
+                            {
+                                Candidate = iceParts[0],
+                                SdpMLineIndex = int.Parse(iceParts[1]),
+                                SdpMid = iceParts[2],
+                            }
+                        };
+                        SendWsMessage(iceMessage);
+                    }
+                    else
+                    {
+                        var sdpMessage = new SdpMessage()
+                        {
+                            Type = type,
+                            Sdp = message.Data
+                        };
+                        SendWsMessage(sdpMessage);
+                    }
+
+                    return Task.CompletedTask;
+                }
+
+                #endregion
+
+
+                protected override void OnIceCandiateReadyToSend(string candidate, int sdpMlineIndex, string sdpMid)
+                {
+                }
+
+                protected override void OnSdpOfferReadyToSend(string offer)
+                {
+                }
+
+                protected override void OnSdpAnswerReadyToSend(string answer)
+                {
+                }
+        */
+        public override Task SendMessageAsync(WebRTC.SdpMessage message)
+        {
+            var sdpMessage = new SdpMessage()
+            {
+                Type = message.Type.ToString(),
+                Sdp = message.Content
+            };
+            SendWsMessage(sdpMessage);
             return Task.CompletedTask;
         }
 
-        #endregion
-
-
-        protected override void OnIceCandiateReadyToSend(string candidate, int sdpMlineIndex, string sdpMid)
+        public override Task SendMessageAsync(IceCandidate candidate)
         {
-        }
-
-        protected override void OnSdpOfferReadyToSend(string offer)
-        {
-        }
-
-        protected override void OnSdpAnswerReadyToSend(string answer)
-        {
+            // var iceParts = message.Data.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+            var iceMessage = new IceMessage()
+            {
+                Ice = new Ice()
+                {
+                    Candidate = candidate.Content,
+                    SdpMLineIndex = candidate.SdpMlineIndex,
+                    SdpMid = candidate.SdpMid,
+                }
+            };
+            SendWsMessage(iceMessage);
+            return Task.CompletedTask;
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
     public class IceMessage
     {
         [JsonProperty("type")]
-        public string Type { set; get; }
+        public string Type { get; } = "candidate";
 
         [JsonProperty("ice")]
         public Ice Ice { set; get; }
