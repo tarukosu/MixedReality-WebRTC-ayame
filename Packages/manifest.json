@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "com.microsoft.mixedreality.webrtc": "file:../External/MixedReality-WebRTC/libs/unity/library",
+    "com.microsoft.mixedreality.webrtc.samples": "file:../External/MixedReality-WebRTC/libs/unity/samples",
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.2.2",
     "com.unity.collab-proxy": "1.2.15",
