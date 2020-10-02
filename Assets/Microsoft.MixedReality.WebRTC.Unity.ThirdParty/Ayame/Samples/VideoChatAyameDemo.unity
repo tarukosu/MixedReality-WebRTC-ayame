@@ -1315,6 +1315,21 @@ PrefabInstance:
       propertyPath: PeerConnection
       value: 
       objectReference: {fileID: 628919155}
+    - target: {fileID: 1653683205836488025, guid: d4331a52f91fbd64ebb9a5e50b6b9fa1,
+        type: 3}
+      propertyPath: signalingKey
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1653683205836488025, guid: d4331a52f91fbd64ebb9a5e50b6b9fa1,
+        type: 3}
+      propertyPath: roomId
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1653683205836488025, guid: d4331a52f91fbd64ebb9a5e50b6b9fa1,
+        type: 3}
+      propertyPath: printDebugLog
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1653683205836488026, guid: d4331a52f91fbd64ebb9a5e50b6b9fa1,
         type: 3}
       propertyPath: m_Name

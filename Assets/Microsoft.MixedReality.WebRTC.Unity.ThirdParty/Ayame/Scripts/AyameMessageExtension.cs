@@ -41,6 +41,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
                     return null;
             }
         }
-
     }
 }
+

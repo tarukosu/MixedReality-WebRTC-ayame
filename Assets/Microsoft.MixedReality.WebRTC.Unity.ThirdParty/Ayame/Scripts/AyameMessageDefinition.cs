@@ -19,8 +19,8 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
         [JsonProperty("authnMetaData")]
         public string AuthnMetaData { set; get; }
 
-        [JsonProperty("key")]
-        public string Key { set; get; }
+        [JsonProperty("signalingKey")]
+        public string SignalingKey { set; get; }
     }
 
     [Preserve]
