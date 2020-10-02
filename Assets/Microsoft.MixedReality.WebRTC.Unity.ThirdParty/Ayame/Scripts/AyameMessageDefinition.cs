@@ -19,8 +19,8 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
         [JsonProperty("authnMetaData")]
         public string AuthnMetaData { set; get; }
 
-        [JsonProperty("key")]
-        public string Key { set; get; }
+        [JsonProperty("signalingKey")]
+        public string SignalingKey { set; get; }
     }
 
     [Preserve]
@@ -44,7 +44,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
     public class IceMessage
     {
         [JsonProperty("type")]
-        public string Type { set; get; }
+        public string Type { get; } = "candidate";
 
         [JsonProperty("ice")]
         public Ice Ice { set; get; }

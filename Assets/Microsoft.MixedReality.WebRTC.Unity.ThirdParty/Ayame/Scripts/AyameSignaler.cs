@@ -5,6 +5,7 @@ using UnityEngine;
 
 using Newtonsoft.Json;
 using WebSocket4Net;
+using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -55,8 +56,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             ws.MessageReceived += Websocket_MessageReceived;
             ws.Closed += Websocket_Closed;
 
-            ws.AutoSendPingInterval = 30;
-            ws.EnableAutoSendPing = true;
+            ws.EnableAutoSendPing = false;
 
             if (autoConnection)
             {
@@ -83,12 +83,13 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             }
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             if (ws != null && ws.State == WebSocketState.Open)
             {
                 ws.Close();
             }
+            base.OnDisable();
         }
 
         public void Connect()
@@ -166,22 +167,24 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
                 case "accept":
                     if (message.IsExistClient)
                     {
-                        PeerConnection.Peer.CreateOffer();
+                        PeerConnection.StartConnection();
                     }
                     break;
                 case "offer":
-                    _nativePeer.SetRemoteDescription("offer", message.Sdp);
-                    _nativePeer.CreateAnswer();
+                    PeerConnection.HandleConnectionMessageAsync(message.ToWebRTCMessage()).ContinueWith(_ =>
+                    {
+                        PeerConnection.Peer.CreateAnswer();
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.RunContinuationsAsynchronously);
                     break;
                 case "answer":
-                    _nativePeer.SetRemoteDescription("answer", message.Sdp);
+                    _ = PeerConnection.HandleConnectionMessageAsync(message.ToWebRTCMessage());
                     break;
                 case "candidate":
-                    _nativePeer.AddIceCandidate(message.Ice.SdpMid, message.Ice.SdpMLineIndex, message.Ice.Candidate);
+                    PeerConnection.Peer.AddIceCandidate(message.ToIceCandidate());
                     break;
             }
         }
-
+        
         private void SendRegisterMessage()
         {
             var clientId = Guid.NewGuid().ToString("N").Substring(0, 10);
@@ -189,7 +192,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             var message = new RegisterMessage()
             {
                 Type = "register",
-                Key = signalingKey,
+                SignalingKey = signalingKey,
                 RoomId = roomId,
                 ClientId = clientId,
             };
@@ -222,65 +225,31 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             ws.Send(message);
         }
 
-        #region ISignaler interface
-
-        public override Task SendMessageAsync(Message message)
+        public override Task SendMessageAsync(WebRTC.SdpMessage message)
         {
-            var type = "";
-            switch (message.MessageType)
+            var sdpMessage = new SdpMessage()
             {
-                case Message.WireMessageType.Offer:
-                    type = "offer";
-                    break;
-                case Message.WireMessageType.Answer:
-                    type = "answer";
-                    break;
-                case Message.WireMessageType.Ice:
-                    type = "candidate";
-                    break;
-            }
-
-            if (message.MessageType == Message.WireMessageType.Ice)
-            {
-                var iceParts = message.Data.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
-                var iceMessage = new IceMessage()
-                {
-                    Type = type,
-                    Ice = new Ice()
-                    {
-                        Candidate = iceParts[0],
-                        SdpMLineIndex = int.Parse(iceParts[1]),
-                        SdpMid = iceParts[2],
-                    }
-                };
-                SendWsMessage(iceMessage);
-            }
-            else
-            {
-                var sdpMessage = new SdpMessage()
-                {
-                    Type = type,
-                    Sdp = message.Data
-                };
-                SendWsMessage(sdpMessage);
-            }
-
+                Type = message.Type.ToString().ToLower(),
+                Sdp = message.Content
+            };
+            SendWsMessage(sdpMessage);
             return Task.CompletedTask;
         }
 
-        #endregion
-
-
-        protected override void OnIceCandiateReadyToSend(string candidate, int sdpMlineIndex, string sdpMid)
+        public override Task SendMessageAsync(IceCandidate candidate)
         {
-        }
-
-        protected override void OnSdpOfferReadyToSend(string offer)
-        {
-        }
-
-        protected override void OnSdpAnswerReadyToSend(string answer)
-        {
+            var iceMessage = new IceMessage()
+            {
+                Ice = new Ice()
+                {
+                    Candidate = candidate.Content,
+                    SdpMLineIndex = candidate.SdpMlineIndex,
+                    SdpMid = candidate.SdpMid,
+                }
+            };
+            SendWsMessage(iceMessage);
+            return Task.CompletedTask;
         }
     }
 }
+
