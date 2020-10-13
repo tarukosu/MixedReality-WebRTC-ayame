@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Microsoft.MixedReality.WebRTC.Unity.ThirdParty/Ayame/Samples/VideoChatAyameDemo.unity
+    guid: c1767066a6cafb147a9f28e50b469ce0
   m_configObjects: {}
