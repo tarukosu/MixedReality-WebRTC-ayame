@@ -16,41 +16,22 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
     public class AyameSignaler : Signaler
     {
         [SerializeField]
-        string serverUrl = "wss://ayame-lite.shiguredo.jp/signaling";
+        private AyameConnectionSettings connectionSettings = null;
+
+        public AyameConnectionSettings ConnectionSettings => connectionSettings;
 
         [SerializeField]
-        string signalingKey = "";
+        private bool printDebugLog = false;
 
-        [SerializeField]
-        string roomId = "";
+        private WebSocket ws;
+        private bool tryToConnect = false;
 
-        [SerializeField]
-        bool autoConnection = true;
-
-        [SerializeField]
-        bool printDebugLog = false;
-
-        WebSocket ws;
-        bool tryToConnect = false;
-
-        readonly object messageQueueLock = new object();
-        ConcurrentQueue<ReceivedMessage> receivedMessageQueue = new ConcurrentQueue<ReceivedMessage>();
-
-        public string RoomId
-        {
-            set
-            {
-                roomId = value;
-            }
-            get
-            {
-                return roomId;
-            }
-        }
+        private readonly object messageQueueLock = new object();
+        private readonly ConcurrentQueue<ReceivedMessage> receivedMessageQueue = new ConcurrentQueue<ReceivedMessage>();
 
         async void Start()
         {
-            ws = new WebSocket(serverUrl);
+            ws = new WebSocket(connectionSettings.ServerUrl);
 
             ws.Opened += Websocket_Opened;
             ws.MessageReceived += Websocket_MessageReceived;
@@ -58,7 +39,7 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
 
             ws.EnableAutoSendPing = false;
 
-            if (autoConnection)
+            if (connectionSettings.AutoConnection)
             {
                 await Task.Delay(3000);
                 tryToConnect = true;
@@ -121,9 +102,10 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             if (printDebugLog)
             {
                 Debug.Log("Websocket closed");
+                Debug.Log(e);
             }
 
-            if (autoConnection)
+            if (connectionSettings.AutoConnection)
             {
                 await Task.Delay(1000);
 
@@ -192,8 +174,8 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             var message = new RegisterMessage()
             {
                 Type = "register",
-                SignalingKey = signalingKey,
-                RoomId = roomId,
+                SignalingKey = connectionSettings.SignalingKey,
+                RoomId = connectionSettings.RoomId,
                 ClientId = clientId,
             };
 
