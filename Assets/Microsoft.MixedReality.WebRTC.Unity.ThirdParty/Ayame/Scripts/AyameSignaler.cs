@@ -80,13 +80,13 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
 
         private void ConnectToServer()
         {
+            tryToConnect = false;
 #if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
             {
                 return;
             }
 #endif
-            tryToConnect = false;
             ws.Open();
         }
 
@@ -109,10 +109,6 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             {
                 await Task.Delay(1000);
 
-                if (!Application.isPlaying)
-                {
-                    return;
-                }
                 if (printDebugLog)
                 {
                     Debug.Log("Reconnect to server");
