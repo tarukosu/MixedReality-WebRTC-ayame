@@ -109,6 +109,10 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
             {
                 await Task.Delay(1000);
 
+                if (!Application.isPlaying)
+                {
+                    return;
+                }
                 if (printDebugLog)
                 {
                     Debug.Log("Reconnect to server");
