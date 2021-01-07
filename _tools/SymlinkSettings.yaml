@@ -1,0 +1,8 @@
+symlinks:
+  # Sample フォルダ
+  - create-dest-folder: true
+    include-meta-file: true
+    src: ..\Assets\Microsoft.MixedReality.WebRTC.Unity.ThirdParty\Ayame\Samples~
+    dest: ..\Assets\Microsoft.MixedReality.WebRTC.Unity.ThirdParty\Ayame\Samples
+    target:
+      - MixedReality-WebRTC Ayame
