@@ -1,0 +1,17 @@
+{
+  "name": "com.tarukosu.mixedreality.webrtc.ayame",
+  "version": "0.4.0",
+  "displayName": "MixedReality-WebRTC Ayame",
+  "description": "Library for MixedReality-WwebRTC and Signaling Server Ayame",
+  "unity": "2018.4",
+  "author": {
+    "name": "Yusuke Furuta (@tarukosu)"
+  },
+  "samples": [
+    {
+      "displayName": "MixedReality-WebRTC Ayame",
+      "description": "Sample scene",
+      "path": "Samples~/MixedReality-WebRTC Ayame"
+    }
+  ]
+}
