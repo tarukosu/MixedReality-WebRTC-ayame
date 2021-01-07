@@ -6,19 +6,19 @@ namespace Microsoft.MixedReality.WebRTC.Unity.ThirdParty.Ayame
     public class AyameConnectionSettings : ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField]
-        private string serverUrl;
+        private string serverUrl = null;
 
         [NonSerialized]
         public string ServerUrl;
 
         [SerializeField]
-        private string signalingKey;
+        private string signalingKey = null;
 
         [NonSerialized]
         public string SignalingKey;
 
         [SerializeField]
-        private string roomId;
+        private string roomId = null;
 
         [NonSerialized]
         public string RoomId;
