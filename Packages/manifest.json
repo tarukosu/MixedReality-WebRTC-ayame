@@ -1,13 +1,23 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "Microsoft Mixed Reality",
+      "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry/",
+      "scopes": [
+        "com.microsoft.mixedreality"
+      ]
+    }
+  ],
   "dependencies": {
-    "com.microsoft.mixedreality.webrtc": "file:../External/MixedReality-WebRTC/libs/unity/library",
-    "com.microsoft.mixedreality.webrtc.samples": "file:../External/MixedReality-WebRTC/libs/unity/samples",
+    "com.microsoft.mixedreality.webrtc": "2.0.2",
+    "com.microsoft.mixedreality.webrtc.samples": "2.0.2",
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.2.2",
     "com.unity.collab-proxy": "1.2.15",
     "com.unity.package-manager-ui": "2.0.8",
     "com.unity.purchasing": "2.0.3",
     "com.unity.textmeshpro": "1.4.1",
+    "com.unity.xr.windowsmr.metro": "1.0.21",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
