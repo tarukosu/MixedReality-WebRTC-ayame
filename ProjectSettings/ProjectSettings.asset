@@ -297,6 +297,10 @@ PlayerSettings:
     m_Devices:
     - Oculus
     - OpenVR
+  - m_BuildTarget: Metro
+    m_Enabled: 0
+    m_Devices:
+    - WindowsMR
   m_BuildTargetEnableVuforiaSettings: []
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
@@ -545,7 +549,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: MixedReality-WebRTC-ayame
   metroPackageVersion: 1.0.0.0
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 80ad649458c0d701
   metroApplicationDescription: MixedReality-WebRTC-ayame
   wsaImages: {}
   metroTileShortName: 
