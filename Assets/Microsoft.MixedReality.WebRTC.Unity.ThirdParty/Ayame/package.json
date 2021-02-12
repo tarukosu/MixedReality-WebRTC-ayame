@@ -1,8 +1,8 @@
 {
   "name": "com.tarukosu.mixedreality.webrtc.ayame",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "displayName": "MixedReality-WebRTC Ayame",
-  "description": "Library for MixedReality-WwebRTC and Signaling Server Ayame",
+  "description": "Library for MixedReality-WebRTC and Signaling Server Ayame",
   "unity": "2018.4",
   "author": {
     "name": "Yusuke Furuta (@tarukosu)"
